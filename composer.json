@@ -1,24 +1,22 @@
 {
-    "name": "vendor_slug/package_slug",
-    "description": ":package_description",
+    "name": "rene-roscher/pterodactyl-api-addon",
+    "description": "This package brings an API interface to the application API in order to be able to create API tokens for a user",
     "keywords": [
-        ":vendor_name",
+        "PterodactylApiAddon",
         "laravel",
-        ":package_slug"
+        "pterodactyl-api-addon"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/pterodactylapiaddon/pterodactyl-api-addon",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Rene Roscher",
+            "email": "roscher794@gmail.com",
             "role": "Developer"
         }
     ],
     "require": {
-        "php": "^8.0",
-        "spatie/laravel-package-tools": "^1.4.3",
-        "illuminate/contracts": "^8.37"
+        "php": "^8.0"
     },
     "require-dev": {
         "nunomaduro/collision": "^5.3",
@@ -34,19 +32,8 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories"
+            "Xepare\\PterodactylApiAddon\\": "src"
         }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests"
-        }
-    },
-    "scripts": {
-        "phpstan": "vendor/bin/phpstan analyse",
-        "test": "./vendor/bin/testbench package:test --parallel --no-coverage",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
     "config": {
         "sort-packages": true
@@ -54,11 +41,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
-            ],
-            "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\SkeletonFacade"
-            }
+                "Xepare\\PterodactylApiAddon\\PterodactylApiAddonServiceProvider"
+            ]
         }
     },
     "minimum-stability": "dev",
