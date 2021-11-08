@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
+namespace Xepare\PterodactylApiAddon\Http\Controllers;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;

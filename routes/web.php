@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Pterodactyl\Http\Controllers\Api\Client\Servers\FileController;
 use Xepare\PterodactylApiAddon\Http\Controllers\ApiKeyController;
+use Xepare\PterodactylApiAddon\Http\Controllers\FileController;
 use Xepare\PterodactylApiAddon\Http\Controllers\FreeAllocationController;
 use Pterodactyl\Http\Middleware\Api\Client\Server\ResourceBelongsToServer;
 use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
