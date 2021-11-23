@@ -27,7 +27,7 @@ class WriteFileContentRequest extends ClientApiRequest implements ClientPermissi
     {
         return [
             'file' => 'required|string',
-            'content' => 'required',
+            'content' => 'nullable',
         ];
     }
 }

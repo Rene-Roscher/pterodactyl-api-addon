@@ -55,7 +55,7 @@ class FileController extends ClientApiController
 
             $this->fileRepository
                 ->setServer($server)
-                ->putContent($request->get('file'), $request->get('content'));
+                ->putContent($request->get('file'), $request->get('content') ?: '');
         });
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
