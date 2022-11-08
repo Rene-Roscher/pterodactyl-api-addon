@@ -66,17 +66,17 @@ class ApiKeyController extends ApplicationApiController
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
-    public function store(StoreApiKeyRequest $request, User $user)
+    public function store(\Request $request, User $user)
     {
         $token = $user->createToken(
-            $request->input('description'),
-            $request->input('allowed_ips')
+            $request->get('description'),
+            $request->get('allowed_ips')
         );
 
         return $this->fractal->item($token->accessToken)
             ->transformWith($this->getTransformer(ApiKeyTransformer::class))
             ->addMeta([
-                'secret_token' => $key->plainTextToken,
+                'secret_token' => $token->plainTextToken,
             ])
             ->toArray();
     }
