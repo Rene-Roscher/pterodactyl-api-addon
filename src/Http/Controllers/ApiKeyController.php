@@ -66,11 +66,11 @@ class ApiKeyController extends ApplicationApiController
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
-    public function store(StoreApiKeyRequest $request, User $user)
+    public function store(User $user)
     {
         $token = $user->createToken(
-            $request->get('description'),
-            $request->get('allowed_ips')
+            request('description'),
+            request('allowed_ips')
         );
 
         return $this->fractal->item($token->accessToken)
