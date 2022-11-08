@@ -11,6 +11,7 @@ use Pterodactyl\Models\User;
 use Pterodactyl\Services\Api\KeyCreationService;
 use Pterodactyl\Repositories\Eloquent\ApiKeyRepository;
 use Pterodactyl\Transformers\Api\Client\ApiKeyTransformer;
+use Laravel\Sanctum\Sanctum;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Pterodactyl\Http\Requests\Api\Client\Account\StoreApiKeyRequest;
 
@@ -68,8 +69,7 @@ class ApiKeyController extends ApplicationApiController
      */
     public function store(User $user)
     {
-        request()->merge(['user_id' => $user->id]);
-
+        dd($user);
         $token = $user->createToken(
             request('description'),
             request('allowed_ips')
