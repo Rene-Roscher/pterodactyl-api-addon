@@ -66,7 +66,7 @@ class ApiKeyController extends ApplicationApiController
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
-    public function store(\Request $request, User $user)
+    public function store(StoreApiKeyRequest $request, User $user)
     {
         $token = $user->createToken(
             $request->get('description'),
