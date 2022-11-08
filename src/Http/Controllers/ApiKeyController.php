@@ -68,16 +68,15 @@ class ApiKeyController extends ApplicationApiController
      */
     public function store(StoreApiKeyRequest $request, User $user)
     {
-        $key = $this->keyCreationService->setKeyType(ApiKey::TYPE_ACCOUNT)->handle([
-            'user_id' => $user->id,
-            'memo' => $request->input('description'),
-            'allowed_ips' => $request->input('allowed_ips') ?? [],
-        ]);
+        $token = $user->createToken(
+            $request->input('description'),
+            $request->input('allowed_ips')
+        );
 
-        return $this->fractal->item($key)
+        return $this->fractal->item($token->accessToken)
             ->transformWith($this->getTransformer(ApiKeyTransformer::class))
             ->addMeta([
-                'secret_token' => $this->encrypter->decrypt($key->token),
+                'secret_token' => $key->plainTextToken,
             ])
             ->toArray();
     }
