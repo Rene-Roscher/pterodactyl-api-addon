@@ -68,6 +68,8 @@ class ApiKeyController extends ApplicationApiController
      */
     public function store(User $user)
     {
+        request()->merge(['user_id' => $user->id]);
+
         $token = $user->createToken(
             request('description'),
             request('allowed_ips')
