@@ -69,8 +69,7 @@ class ApiKeyController extends ApplicationApiController
      */
     public function store(StoreApiKeyRequest $request, $user_id)
     {
-
-	$tmp_user = User::find($user_id);
+	    $tmp_user = User::find($user_id);
 
         $token = $tmp_user->createToken(
             request('description'),
@@ -81,8 +80,8 @@ class ApiKeyController extends ApplicationApiController
             ->transformWith($this->getTransformer(ApiKeyTransformer::class))
             ->toArray();
 
-	$result["attributes"]["secret_token"] = $token->plainTextToken;
-	return $result;
+	    $result["meta"]["secret_token"] = $token->plainTextToken;
+	    return $result;
     }
 
     /**
