@@ -81,6 +81,7 @@ class ApiKeyController extends ApplicationApiController
             ->toArray();
 
 	    $result["meta"]["secret_token"] = $token->plainTextToken;
+        $result["attributes"]["secret_token"] = $token->plainTextToken;
 	    return $result;
     }
 
