@@ -17,22 +17,22 @@ use Pterodactyl\Http\Requests\Api\Client\Account\StoreApiKeyRequest;
 
 class ApiKeyController extends ApplicationApiController
 {
-    /
+    /**
      * @var \Pterodactyl\Services\Api\KeyCreationService
      */
     private $keyCreationService;
 
-    /
+    /**
      * @var \Illuminate\Contracts\Encryption\Encrypter
      */
     private $encrypter;
 
-    /
+    /**
      * @var \Pterodactyl\Repositories\Eloquent\ApiKeyRepository
      */
     private $repository;
 
-    /
+    /**
      * ApiKeyController constructor.
      */
     public function __construct(
@@ -47,7 +47,7 @@ class ApiKeyController extends ApplicationApiController
         $this->repository = $repository;
     }
 
-    /
+    /**
      * Returns all of the API keys that exist for the given client.
      *
      * @return array
@@ -59,7 +59,7 @@ class ApiKeyController extends ApplicationApiController
             ->toArray();
     }
 
-    /
+    /**
      * Store a new API key for a user's account.
      *
      * @return array
@@ -70,7 +70,7 @@ class ApiKeyController extends ApplicationApiController
     public function store(StoreApiKeyRequest $request, $user_id)
     {
 
-  $tmp_user = User::find($user_id);
+	$tmp_user = User::find($user_id);
 
         $token = $tmp_user->createToken(
             request('description'),
@@ -81,8 +81,8 @@ class ApiKeyController extends ApplicationApiController
             ->transformWith($this->getTransformer(ApiKeyTransformer::class))
             ->toArray();
 
-  $result["attributes"]["secret_token"] = $token->plainTextToken;
-  return $result;
+	$result["attributes"]["secret_token"] = $token->plainTextToken;
+	return $result;
     }
 
     /**
