@@ -39,8 +39,8 @@ class ApiKeyController extends ApplicationApiController
     public function store(User $user)
     {
         $token = $user->createToken(
-            $request->input('description'),
-            $request->input('allowed_ips')
+            request()->input('description'),
+            request()->input('allowed_ips')
         );
         
         return $this->fractal->item($token->accessToken)
