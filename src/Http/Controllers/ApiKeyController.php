@@ -19,32 +19,32 @@ class ApiKeyController extends ApplicationApiController
     /**
      * @var \Pterodactyl\Services\Api\KeyCreationService
      */
-    private $keyCreationService;
+    //private $keyCreationService;
 
     /**
      * @var \Illuminate\Contracts\Encryption\Encrypter
      */
-    private $encrypter;
+    //private $encrypter;
 
     /**
      * @var \Pterodactyl\Repositories\Eloquent\ApiKeyRepository
      */
-    private $repository;
+    //private $repository;
 
     /**
      * ApiKeyController constructor.
      */
-    public function __construct(
-        Encrypter $encrypter,
-        KeyCreationService $keyCreationService,
-        ApiKeyRepository $repository
-    ) {
-        parent::__construct();
+    //public function __construct(
+    //    Encrypter $encrypter,
+    //    KeyCreationService $keyCreationService,
+    //    ApiKeyRepository $repository
+    //) {
+    //    parent::__construct();
 
-        $this->encrypter = $encrypter;
-        $this->keyCreationService = $keyCreationService;
-        $this->repository = $repository;
-    }
+    //    $this->encrypter = $encrypter;
+    //    $this->keyCreationService = $keyCreationService;
+    //    $this->repository = $repository;
+    //}
 
     /**
      * Returns all of the API keys that exist for the given client.
@@ -68,16 +68,22 @@ class ApiKeyController extends ApplicationApiController
      */
     public function store(StoreApiKeyRequest $request, User $user)
     {
-        $key = $this->keyCreationService->setKeyType(ApiKey::TYPE_ACCOUNT)->handle([
-            'user_id' => $user->id,
-            'memo' => $request->input('description'),
-            'allowed_ips' => $request->input('allowed_ips') ?? [],
-        ]);
+        //$key = $this->keyCreationService->setKeyType(ApiKey::TYPE_ACCOUNT)->handle([
+        //    'user_id' => $user->id,
+        //    'memo' => $request->input('description'),
+        //    'allowed_ips' => $request->input('allowed_ips') ?? [],
+        //]);
 
+        $token = $user->createToken(
+            $request->input('description'),
+            $request->input('allowed_ips')
+        );
+        
         return $this->fractal->item($key)
             ->transformWith($this->getTransformer(ApiKeyTransformer::class))
             ->addMeta([
-                'secret_token' => $this->encrypter->decrypt($key->token),
+                //'secret_token' => $this->encrypter->decrypt($key->token),
+                'secret_token' => $token->plainTextToken
             ])
             ->toArray();
     }
@@ -89,15 +95,18 @@ class ApiKeyController extends ApplicationApiController
      */
     public function delete(GetUsersApiKeysRequest $request, User $user, string $identifier)
     {
-        $response = $this->repository->deleteWhere([
-            'key_type' => ApiKey::TYPE_ACCOUNT,
-            'user_id' => $user->id,
-            'identifier' => $identifier,
-        ]);
+        //$response = $this->repository->deleteWhere([
+        //    'key_type' => ApiKey::TYPE_ACCOUNT,
+        //    'user_id' => $user->id,
+        //    'identifier' => $identifier,
+        //]);
 
-        if (!$response) {
-            throw new NotFoundHttpException();
-        }
+        $key = $user->apiKeys()
+            ->where('key_type', ApiKey::TYPE_ACCOUNT)
+            ->where('identifier', $identifier)
+            ->firstOrFail();
+        
+        $key->delete();
 
         return JsonResponse::create([], JsonResponse::HTTP_NO_CONTENT);
     }
