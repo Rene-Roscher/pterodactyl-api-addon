@@ -21,9 +21,10 @@ class ApiKeyController extends ApplicationApiController
      *
      * @return array
      */
-    public function index(GetUsersApiKeysRequest $request, User $user)
+    public function index(GetUsersApiKeysRequest $request, $user)
     {
-        dd($user);
+        $user = User::findOrFail($user);
+        dd(2, $user);
         return $this->fractal->collection($user->apiKeys)
             ->transformWith($this->getTransformer(ApiKeyTransformer::class))
             ->toArray();
@@ -37,9 +38,10 @@ class ApiKeyController extends ApplicationApiController
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
-    public function store(User $user)
+    public function store($user)
     {
-                dd($user);
+        $user = User::findOrFail($user);
+        dd(2, $user);
         $token = $user->createToken(
             request()->input('description'),
             request()->input('allowed_ips')
