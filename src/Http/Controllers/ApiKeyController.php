@@ -24,7 +24,6 @@ class ApiKeyController extends ApplicationApiController
     public function index(GetUsersApiKeysRequest $request, $user)
     {
         $user = User::findOrFail($user);
-        dd(2, $user);
         return $this->fractal->collection($user->apiKeys)
             ->transformWith($this->getTransformer(ApiKeyTransformer::class))
             ->toArray();
@@ -41,10 +40,10 @@ class ApiKeyController extends ApplicationApiController
     public function store($user)
     {
         $user = User::findOrFail($user);
-        dd(2, $user);
+
         $token = $user->createToken(
-            request()->input('description'),
-            request()->input('allowed_ips')
+            request('description'),
+            request('allowed_ips')
         );
         
         return $this->fractal->item($token->accessToken)
@@ -60,8 +59,10 @@ class ApiKeyController extends ApplicationApiController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function delete(GetUsersApiKeysRequest $request, User $user, string $identifier)
+    public function delete(GetUsersApiKeysRequest $request, $user, string $identifier)
     {
+        $user = User::findOrFail($user);
+        
         $key = $user->apiKeys()
             ->where('key_type', ApiKey::TYPE_ACCOUNT)
             ->where('identifier', $identifier)
