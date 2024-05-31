@@ -23,6 +23,7 @@ class ApiKeyController extends ApplicationApiController
      */
     public function index(GetUsersApiKeysRequest $request, User $user)
     {
+        dd($user);
         return $this->fractal->collection($user->apiKeys)
             ->transformWith($this->getTransformer(ApiKeyTransformer::class))
             ->toArray();
@@ -38,6 +39,7 @@ class ApiKeyController extends ApplicationApiController
      */
     public function store(User $user)
     {
+                dd($user);
         $token = $user->createToken(
             request()->input('description'),
             request()->input('allowed_ips')
