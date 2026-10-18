@@ -3,6 +3,7 @@
 namespace Xepare\PterodactylApiAddon\Http\Requests;
 
 use IPTools\Range;
+use IPTools\Exception\IpException;
 use Pterodactyl\Models\ApiKey;
 use Illuminate\Validation\Validator;
 use Pterodactyl\Services\Acl\Api\AdminAcl as Acl;
@@ -39,11 +40,7 @@ class StoreUsersApiKeyRequest extends ApplicationApiRequest
                 $valid = true;
                 try {
                     Range::parse($ip);
-                } catch (\Exception $exception) {
-                    if ($exception->getMessage() !== 'Invalid IP address format') {
-                        throw $exception;
-                    }
-
+                } catch (IpException) {
                     $valid = false;
                 }
 
