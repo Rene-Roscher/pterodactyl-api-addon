@@ -37,10 +37,13 @@ class StoreUsersApiKeyRequest extends ApplicationApiRequest
 
             foreach ($ips as $index => $ip) {
                 $valid = true;
-
                 try {
                     Range::parse($ip);
-                } catch (\InvalidArgumentException) {
+                } catch (\Exception $exception) {
+                    if ($exception->getMessage() !== 'Invalid IP address format') {
+                        throw $exception;
+                    }
+
                     $valid = false;
                 }
 

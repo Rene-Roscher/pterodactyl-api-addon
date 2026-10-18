@@ -6,6 +6,7 @@ use Pterodactyl\Models\Node;
 use Pterodactyl\Models\User;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\ApiKey;
+use Pterodactyl\Models\Location;
 use Pterodactyl\Models\Allocation;
 use Pterodactyl\Services\Acl\Api\AdminAcl;
 use Pterodactyl\Tests\Integration\Api\Application\ApplicationApiIntegrationTestCase;
@@ -195,7 +196,8 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
     {
         $admin = User::factory()->admin()->create();
 
-        $node = Node::factory()->create();
+        $location = Location::factory()->create();
+        $node = Node::factory()->create(['location_id' => $location->id]);
         $freeAllocation = Allocation::factory()->create([
             'node_id' => $node->id,
             'server_id' => null,
