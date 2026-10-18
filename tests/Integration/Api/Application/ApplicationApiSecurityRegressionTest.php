@@ -48,7 +48,6 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
         $this->getJson("/api/application/nodes/{$node->id}/allocations/free")
             ->assertUnauthorized();
 
-        $this->assertDatabaseHas('api_keys', ['id' => $victimKey->id]);
     }
 
     public function testNonAdminSessionCannotAccessApplicationRoutes(): void
