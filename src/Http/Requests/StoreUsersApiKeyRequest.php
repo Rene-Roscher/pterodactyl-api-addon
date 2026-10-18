@@ -36,8 +36,10 @@ class StoreUsersApiKeyRequest extends ApplicationApiRequest
             }
 
             foreach ($ips as $index => $ip) {
+                $valid = true;
+
                 try {
-                    $valid = Range::parse($ip)->valid();
+                    Range::parse($ip);
                 } catch (\InvalidArgumentException) {
                     $valid = false;
                 }
