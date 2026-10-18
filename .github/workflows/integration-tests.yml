@@ -73,7 +73,7 @@ jobs:
 
       - name: Get Composer cache directory
         id: composer-cache
-        working-directory: /home/runner/work/pterodactyl-api-addon/panel
+        working-directory: ${{ github.workspace }}/panel
         run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
 
       - name: Cache Composer dependencies
@@ -85,7 +85,7 @@ jobs:
             ${{ runner.os }}-composer-panel-
 
       - name: Configure Panel test environment
-        working-directory: /home/runner/work/pterodactyl-api-addon/panel
+        working-directory: ${{ github.workspace }}/panel
         run: |
           cp .env.example .env
           {
@@ -120,22 +120,22 @@ jobs:
           mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS panel_integration_test"
 
       - name: Install Panel dependencies
-        working-directory: /home/runner/work/pterodactyl-api-addon/panel
+        working-directory: ${{ github.workspace }}/panel
         run: composer install --no-interaction --no-progress --prefer-dist
 
       - name: Install add-on from local path repository
-        working-directory: /home/runner/work/pterodactyl-api-addon/panel
+        working-directory: ${{ github.workspace }}/panel
         run: |
           composer config repositories.local-addon '{"type":"path","url":"../pterodactyl-api-addon","options":{"symlink":true}}'
           composer require rene-roscher/pterodactyl-api-addon:@dev --no-interaction --no-progress
 
       - name: Verify local package source is this checkout
-        working-directory: /home/runner/work/pterodactyl-api-addon/panel
+        working-directory: ${{ github.workspace }}/panel
         run: |
           php -r '$expected = realpath("../pterodactyl-api-addon"); $actual = realpath("vendor/rene-roscher/pterodactyl-api-addon"); if (!$expected || !$actual || $expected !== $actual) { fwrite(STDERR, "Expected local package path {$expected}, got {$actual}.\n"); exit(1);} echo "Using local package checkout: {$actual}\n";'
 
       - name: Verify package discovery and route registration
-        working-directory: /home/runner/work/pterodactyl-api-addon/panel
+        working-directory: ${{ github.workspace }}/panel
         run: |
           php artisan package:discover --ansi
           php -r 'require "vendor/autoload.php"; $app = require "bootstrap/app.php"; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); if (!$app->providerIsLoaded(Xepare\PterodactylApiAddon\PterodactylApiAddonServiceProvider::class)) { fwrite(STDERR, "Add-on service provider was not discovered.\n"); exit(1);} echo "Add-on service provider discovered.\n";'
@@ -144,18 +144,18 @@ jobs:
           php artisan route:list --path='api/client/servers/{server}/files/update' | grep -q 'FileController'
 
       - name: Run PHP syntax checks
-        working-directory: /home/runner/work/pterodactyl-api-addon/pterodactyl-api-addon
+        working-directory: ${{ github.workspace }}/pterodactyl-api-addon
         run: |
           find src tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 
       - name: Run code style checks
-        working-directory: /home/runner/work/pterodactyl-api-addon/pterodactyl-api-addon
+        working-directory: ${{ github.workspace }}/pterodactyl-api-addon
         run: ../panel/vendor/bin/php-cs-fixer fix --dry-run --diff --config=../panel/.php-cs-fixer.php src tests
 
       - name: Run static analysis
-        working-directory: /home/runner/work/pterodactyl-api-addon/pterodactyl-api-addon
+        working-directory: ${{ github.workspace }}/pterodactyl-api-addon
         run: ../panel/vendor/bin/phpstan analyse --no-progress --autoload-file=../panel/vendor/autoload.php src tests
 
       - name: Run add-on integration tests against bootstrapped Panel
-        working-directory: /home/runner/work/pterodactyl-api-addon/pterodactyl-api-addon
+        working-directory: ${{ github.workspace }}/pterodactyl-api-addon
         run: ../panel/vendor/bin/phpunit -c phpunit.integration.xml
