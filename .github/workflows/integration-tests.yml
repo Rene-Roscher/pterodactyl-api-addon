@@ -91,6 +91,7 @@ jobs:
           {
             echo "APP_ENV=testing"
             echo "APP_DEBUG=false"
+            echo "APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
             echo "APP_URL=http://localhost"
             echo "CACHE_DRIVER=array"
             echo "QUEUE_CONNECTION=sync"
