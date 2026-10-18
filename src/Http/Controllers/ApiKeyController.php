@@ -21,7 +21,9 @@ class ApiKeyController extends ApplicationApiController
      */
     public function index(GetUsersApiKeysRequest $request, User $user): array
     {
-        return $this->fractal->collection($user->apiKeys)
+        return $this->fractal->collection(
+            $user->apiKeys()->where('key_type', ApiKey::TYPE_ACCOUNT)->get()
+        )
             ->transformWith($this->getTransformer(ApiKeyTransformer::class))
             ->toArray();
     }
