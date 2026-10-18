@@ -16,11 +16,17 @@
         }
     ],
     "require": {
-        "php": "^8.0|^8.1|^8.2|^8.3"
+        "php": "^8.0|^8.1|^8.2|^8.3",
+        "s1lentium/iptools": "^1.2"
     },
     "autoload": {
         "psr-4": {
             "Xepare\\PterodactylApiAddon\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Xepare\\PterodactylApiAddon\\Tests\\": "tests"
         }
     },
     "config": {
