@@ -38,12 +38,10 @@ class StoreUsersApiKeyRequest extends ApplicationApiRequest
             foreach ($ips as $index => $ip) {
                 try {
                     $valid = Range::parse($ip)->valid();
-                } catch (\Exception $exception) {
-                    if ($exception->getMessage() !== 'Invalid IP address format') {
-                        throw $exception;
-                    }
-
+                } catch (\InvalidArgumentException) {
                     $valid = false;
+                } catch (\Throwable $exception) {
+                    throw $exception;
                 }
 
                 $validator->errors()->addIf(!$valid, "allowed_ips.{$index}", '"' . $ip . '" is not a valid IP address or CIDR range.');
