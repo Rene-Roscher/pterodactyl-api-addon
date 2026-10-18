@@ -2,17 +2,17 @@
 
 namespace Xepare\PterodactylApiAddon\Tests\Integration\Api\Application;
 
-use Illuminate\Http\Response;
-use Pterodactyl\Models\ApiKey;
 use Pterodactyl\Models\Node;
 use Pterodactyl\Models\User;
+use Illuminate\Http\Response;
+use Pterodactyl\Models\ApiKey;
 use Pterodactyl\Models\Allocation;
 use Pterodactyl\Services\Acl\Api\AdminAcl;
 use Pterodactyl\Tests\Integration\Api\Application\ApplicationApiIntegrationTestCase;
 
 class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTestCase
 {
-    public function test_unauthenticated_request_cannot_access_application_api_routes(): void
+    public function testUnauthenticatedRequestCannotAccessApplicationApiRoutes(): void
     {
         $target = User::factory()->create();
 
@@ -21,7 +21,7 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
             ->assertUnauthorized();
     }
 
-    public function test_non_admin_account_token_cannot_access_application_routes_even_with_valid_credentials(): void
+    public function testNonAdminAccountTokenCannotAccessApplicationRoutesEvenWithValidCredentials(): void
     {
         $attacker = User::factory()->create(['root_admin' => false]);
         $victim = User::factory()->create();
@@ -49,7 +49,7 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
         $this->assertDatabaseHas('api_keys', ['id' => $victimKey->id]);
     }
 
-    public function test_non_admin_session_cannot_access_application_routes(): void
+    public function testNonAdminSessionCannotAccessApplicationRoutes(): void
     {
         $user = User::factory()->create(['root_admin' => false]);
         $target = User::factory()->create();
@@ -59,7 +59,7 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
             ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
-    public function test_admin_application_token_with_read_acl_can_read_but_not_write_user_api_keys(): void
+    public function testAdminApplicationTokenWithReadAclCanReadButNotWriteUserApiKeys(): void
     {
         $admin = User::factory()->admin()->create();
         $target = User::factory()->create();
@@ -83,7 +83,7 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
         $this->assertDatabaseHas('api_keys', ['id' => $existing->id]);
     }
 
-    public function test_admin_application_token_without_users_read_permission_is_rejected_for_list_route(): void
+    public function testAdminApplicationTokenWithoutUsersReadPermissionIsRejectedForListRoute(): void
     {
         $admin = User::factory()->admin()->create();
         $target = User::factory()->create();
@@ -95,7 +95,7 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
             ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
-    public function test_admin_write_authorization_allows_create_and_delete_without_leaking_plaintext_token(): void
+    public function testAdminWriteAuthorizationAllowsCreateAndDeleteWithoutLeakingPlaintextToken(): void
     {
         $admin = User::factory()->admin()->create();
         $target = User::factory()->create();
@@ -137,7 +137,7 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
         ]);
     }
 
-    public function test_invalid_allowed_ip_data_is_rejected_and_does_not_create_a_key(): void
+    public function testInvalidAllowedIpDataIsRejectedAndDoesNotCreateAKey(): void
     {
         $admin = User::factory()->admin()->create();
         $target = User::factory()->create();
@@ -156,7 +156,7 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
         $this->assertSame($before, ApiKey::query()->count());
     }
 
-    public function test_api_key_deletion_cannot_target_another_user_by_swapping_route_parameters(): void
+    public function testApiKeyDeletionCannotTargetAnotherUserBySwappingRouteParameters(): void
     {
         $admin = User::factory()->admin()->create();
         $userA = User::factory()->create();
@@ -172,7 +172,7 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
         $this->assertDatabaseHas('api_keys', ['id' => $userAKey->id]);
     }
 
-    public function test_account_api_key_delete_route_does_not_delete_application_api_keys(): void
+    public function testAccountApiKeyDeleteRouteDoesNotDeleteApplicationApiKeys(): void
     {
         $admin = User::factory()->admin()->create();
         $target = User::factory()->create();
@@ -191,7 +191,7 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
         $this->assertDatabaseHas('api_keys', ['id' => $applicationKey->id]);
     }
 
-    public function test_free_allocations_route_requires_read_permission_and_returns_only_unassigned_allocations(): void
+    public function testFreeAllocationsRouteRequiresReadPermissionAndReturnsOnlyUnassignedAllocations(): void
     {
         $admin = User::factory()->admin()->create();
 

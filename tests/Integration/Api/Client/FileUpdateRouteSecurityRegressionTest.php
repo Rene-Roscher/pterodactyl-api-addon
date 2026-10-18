@@ -2,17 +2,17 @@
 
 namespace Xepare\PterodactylApiAddon\Tests\Integration\Api\Client;
 
+use Pterodactyl\Models\User;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\ApiKey;
 use Pterodactyl\Models\Server;
-use Pterodactyl\Models\User;
 use Pterodactyl\Models\Permission;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
 use Pterodactyl\Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
 
 class FileUpdateRouteSecurityRegressionTest extends ClientApiIntegrationTestCase
 {
-    public function test_unauthenticated_request_cannot_access_file_update_route(): void
+    public function testUnauthenticatedRequestCannotAccessFileUpdateRoute(): void
     {
         [, $server] = $this->generateTestAccount();
 
@@ -22,7 +22,7 @@ class FileUpdateRouteSecurityRegressionTest extends ClientApiIntegrationTestCase
         ])->assertUnauthorized();
     }
 
-    public function test_server_owner_with_valid_session_can_update_file(): void
+    public function testServerOwnerWithValidSessionCanUpdateFile(): void
     {
         [$user, $server] = $this->generateTestAccount();
 
@@ -36,7 +36,7 @@ class FileUpdateRouteSecurityRegressionTest extends ClientApiIntegrationTestCase
             ->assertStatus(Response::HTTP_NO_CONTENT);
     }
 
-    public function test_valid_account_token_cannot_update_files_for_unrelated_server(): void
+    public function testValidAccountTokenCannotUpdateFilesForUnrelatedServer(): void
     {
         $attacker = User::factory()->create();
         [, $victimServer] = $this->generateTestAccount();
@@ -49,7 +49,7 @@ class FileUpdateRouteSecurityRegressionTest extends ClientApiIntegrationTestCase
         ])->assertNotFound();
     }
 
-    public function test_subuser_without_file_create_permission_is_rejected(): void
+    public function testSubuserWithoutFileCreatePermissionIsRejected(): void
     {
         [$user, $server] = $this->generateTestAccount([Permission::ACTION_WEBSOCKET_CONNECT]);
 
@@ -61,7 +61,7 @@ class FileUpdateRouteSecurityRegressionTest extends ClientApiIntegrationTestCase
             ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
-    public function test_subuser_with_file_create_permission_can_update_files(): void
+    public function testSubuserWithFileCreatePermissionCanUpdateFiles(): void
     {
         [$user, $server] = $this->generateTestAccount([Permission::ACTION_FILE_CREATE]);
 
@@ -75,7 +75,7 @@ class FileUpdateRouteSecurityRegressionTest extends ClientApiIntegrationTestCase
             ->assertStatus(Response::HTTP_NO_CONTENT);
     }
 
-    public function test_application_api_token_is_rejected_on_client_file_route(): void
+    public function testApplicationApiTokenIsRejectedOnClientFileRoute(): void
     {
         $user = User::factory()->create();
         [, $server] = $this->generateTestAccount();
@@ -93,7 +93,7 @@ class FileUpdateRouteSecurityRegressionTest extends ClientApiIntegrationTestCase
             ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
-    public function test_request_validation_runs_before_file_write(): void
+    public function testRequestValidationRunsBeforeFileWrite(): void
     {
         [$user, $server] = $this->generateTestAccount([Permission::ACTION_FILE_CREATE]);
 

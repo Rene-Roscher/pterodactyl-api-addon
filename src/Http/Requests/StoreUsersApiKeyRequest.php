@@ -3,8 +3,8 @@
 namespace Xepare\PterodactylApiAddon\Http\Requests;
 
 use IPTools\Range;
-use Illuminate\Validation\Validator;
 use Pterodactyl\Models\ApiKey;
+use Illuminate\Validation\Validator;
 use Pterodactyl\Services\Acl\Api\AdminAcl as Acl;
 use Pterodactyl\Http\Requests\Api\Application\ApplicationApiRequest;
 

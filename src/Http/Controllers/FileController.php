@@ -2,32 +2,18 @@
 
 namespace Xepare\PterodactylApiAddon\Http\Controllers;
 
-use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\AuditLog;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Services\Nodes\NodeJWTService;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
-use Pterodactyl\Transformers\Daemon\FileObjectTransformer;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\CopyFileRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\PullFileRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ListFilesRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ChmodFilesRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\DeleteFileRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\RenameFileRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\CreateFolderRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\CompressFilesRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\DecompressFilesRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Files\GetFileContentsRequest;
 use Xepare\PterodactylApiAddon\Http\Requests\WriteFileContentRequest;
 
 class FileController extends ClientApiController
 {
     /**
-     * @var \Pterodactyl\Repositories\Wings\DaemonFileRepository
+     * @var DaemonFileRepository
      */
     private $fileRepository;
 
@@ -35,7 +21,7 @@ class FileController extends ClientApiController
      * FileController constructor.
      */
     public function __construct(
-        DaemonFileRepository $fileRepository
+        DaemonFileRepository $fileRepository,
     ) {
         parent::__construct();
 
@@ -60,5 +46,4 @@ class FileController extends ClientApiController
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
-
 }

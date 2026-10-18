@@ -1,24 +1,16 @@
 <?php
 
-
 namespace Xepare\PterodactylApiAddon\Http\Requests;
 
-use Pterodactyl\Http\Requests\Api\Application\ApplicationApiRequest;
 use Pterodactyl\Services\Acl\Api\AdminAcl as Acl;
+use Pterodactyl\Http\Requests\Api\Application\ApplicationApiRequest;
 
 /**
- * Class GetUsersApiKeysRequest
- * @package Pterodactyl\Http\Requests\Api\Application\Users
+ * Class GetUsersApiKeysRequest.
  */
 class GetUsersApiKeysRequest extends ApplicationApiRequest
 {
-    /**
-     * @var string
-     */
     protected ?string $resource = Acl::RESOURCE_USERS;
 
-    /**
-     * @var int
-     */
     protected int $permission = Acl::READ;
 }

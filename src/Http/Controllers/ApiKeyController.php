@@ -2,17 +2,17 @@
 
 namespace Xepare\PterodactylApiAddon\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Models\ApiKey;
 use Pterodactyl\Models\User;
+use Pterodactyl\Models\ApiKey;
+use Illuminate\Http\JsonResponse;
+use Pterodactyl\Facades\Activity;
+use Illuminate\Support\Facades\DB;
 use Pterodactyl\Exceptions\DisplayException;
-use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
 use Pterodactyl\Transformers\Api\Client\ApiKeyTransformer;
 use Xepare\PterodactylApiAddon\Http\Requests\GetUsersApiKeysRequest;
 use Xepare\PterodactylApiAddon\Http\Requests\StoreUsersApiKeyRequest;
 use Xepare\PterodactylApiAddon\Http\Requests\WriteUsersApiKeysRequest;
+use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
 
 class ApiKeyController extends ApplicationApiController
 {

@@ -9,7 +9,6 @@ use Pterodactyl\Http\Requests\Api\Application\Allocations\GetAllocationsRequest;
 
 class FreeAllocationController extends ApplicationApiController
 {
-
     /**
      * Return all free allocations that exist for a given node.
      */
@@ -21,5 +20,4 @@ class FreeAllocationController extends ApplicationApiController
             ->transformWith($this->getTransformer(AllocationTransformer::class))
             ->toArray();
     }
-
 }
