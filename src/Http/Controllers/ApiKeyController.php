@@ -74,6 +74,6 @@ class ApiKeyController extends ApplicationApiController
 
         $key->delete();
 
-        return JsonResponse::create([], JsonResponse::HTTP_NO_CONTENT);
+        return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
     }
 }

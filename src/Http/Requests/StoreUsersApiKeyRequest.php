@@ -40,8 +40,6 @@ class StoreUsersApiKeyRequest extends ApplicationApiRequest
                     $valid = Range::parse($ip)->valid();
                 } catch (\InvalidArgumentException) {
                     $valid = false;
-                } catch (\Throwable $exception) {
-                    throw $exception;
                 }
 
                 $validator->errors()->addIf(!$valid, "allowed_ips.{$index}", '"' . $ip . '" is not a valid IP address or CIDR range.');
