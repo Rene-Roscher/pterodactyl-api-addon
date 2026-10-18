@@ -25,7 +25,7 @@ No production credentials or external secrets are required.
 
 ## Running integration tests locally
 
-From the add-on repository root (`/home/runner/work/pterodactyl-api-addon/pterodactyl-api-addon` in CI):
+From the add-on repository root:
 
 1. Check out the Panel next to this repository:
 
