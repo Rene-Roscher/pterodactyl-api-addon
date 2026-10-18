@@ -78,8 +78,8 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
             'allowed_ips' => ['127.0.0.1'],
         ])->assertStatus(Response::HTTP_FORBIDDEN);
 
-        $deleteResponse = $this->deleteJson("/api/application/users/{$target->id}/api-keys/{$existing->identifier}");
-        $this->assertTrue(in_array($deleteResponse->getStatusCode(), [Response::HTTP_FORBIDDEN, Response::HTTP_NOT_FOUND], true));
+        $this->deleteJson("/api/application/users/{$target->id}/api-keys/{$existing->identifier}")
+            ->assertNotFound();
 
     }
 
