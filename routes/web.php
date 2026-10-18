@@ -19,7 +19,7 @@ Route::prefix('/api/application')->middleware(['api', 'application-api', 'thrott
     });
 });
 
-Route::middleware(['client-api', 'throttle:api.client'])->prefix('/api/client')->scopeBindings()->group(function () {
+Route::middleware(['api', 'client-api', 'throttle:api.client'])->prefix('/api/client')->scopeBindings()->group(function () {
     Route::group(['prefix' => '/servers/{server}', 'middleware' => [AuthenticateServerAccess::class, ResourceBelongsToServer::class]], function () {
         Route::group(['prefix' => '/files'], function () {
             Route::post('/update', FileController::class);

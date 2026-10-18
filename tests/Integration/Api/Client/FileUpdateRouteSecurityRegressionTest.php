@@ -107,7 +107,7 @@ class FileUpdateRouteSecurityRegressionTest extends ClientApiIntegrationTestCase
 
     private function authenticateWithAccountToken(User $user): void
     {
-        $token = $user->createToken('Client Key', ['127.0.0.1']);
+        $token = $user->createToken('Client Key', []);
         $this->withHeader('Authorization', 'Bearer ' . $token->plainTextToken);
     }
 

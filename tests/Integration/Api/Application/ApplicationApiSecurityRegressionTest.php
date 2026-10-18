@@ -228,7 +228,7 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
 
     private function authenticateWithAccountToken(User $user): void
     {
-        $token = $user->createToken('Account Token', ['127.0.0.1']);
+        $token = $user->createToken('Account Token', []);
 
         $this->withHeader('Authorization', 'Bearer ' . $token->plainTextToken);
     }
