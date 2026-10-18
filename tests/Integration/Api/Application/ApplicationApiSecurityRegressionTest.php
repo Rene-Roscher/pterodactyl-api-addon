@@ -46,7 +46,7 @@ class ApplicationApiSecurityRegressionTest extends ApplicationApiIntegrationTest
         Allocation::factory()->create(['node_id' => $node->id]);
 
         $this->getJson("/api/application/nodes/{$node->id}/allocations/free")
-            ->assertStatus(Response::HTTP_FORBIDDEN);
+            ->assertUnauthorized();
 
         $this->assertDatabaseHas('api_keys', ['id' => $victimKey->id]);
     }
