@@ -2,11 +2,12 @@
 
 namespace Xepare\PterodactylApiAddon\Tests\Integration\Api\Client;
 
-use Pterodactyl\Models\User;
+use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\ApiKey;
-use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Permission;
+use Pterodactyl\Models\Server;
+use Pterodactyl\Models\User;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
 use Pterodactyl\Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
 
@@ -46,7 +47,7 @@ class FileUpdateRouteSecurityRegressionTest extends ClientApiIntegrationTestCase
         $this->postJson("/api/client/servers/{$victimServer->uuid}/files/update", [
             'file' => '/config.yml',
             'content' => 'name: blocked',
-        ])->assertNotFound();
+        ])->assertUnauthorized();
     }
 
     public function testSubuserWithoutFileCreatePermissionIsRejected(): void
@@ -121,6 +122,6 @@ class FileUpdateRouteSecurityRegressionTest extends ClientApiIntegrationTestCase
 
         $mock->expects('putContent')
             ->with($file, $content)
-            ->andReturnNull();
+            ->andReturn(new Psr7Response());
     }
 }
