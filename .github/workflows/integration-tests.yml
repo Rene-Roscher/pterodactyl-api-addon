@@ -191,7 +191,7 @@ jobs:
 
       - name: Run code style checks
         working-directory: ${{ github.workspace }}/pterodactyl-api-addon
-        run: ../panel/vendor/bin/php-cs-fixer fix --dry-run --diff --config=../panel/.php-cs-fixer.php src tests
+        run: ../panel/vendor/bin/php-cs-fixer fix --dry-run --diff --config=../panel/.php-cs-fixer.dist.php src tests
 
       - name: Run static analysis
         working-directory: ${{ github.workspace }}/pterodactyl-api-addon
