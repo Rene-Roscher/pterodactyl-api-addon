@@ -139,9 +139,50 @@ jobs:
         run: |
           php artisan package:discover --ansi
           php -r 'require "vendor/autoload.php"; $app = require "bootstrap/app.php"; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); if (!$app->providerIsLoaded(Xepare\PterodactylApiAddon\PterodactylApiAddonServiceProvider::class)) { fwrite(STDERR, "Add-on service provider was not discovered.\n"); exit(1);} echo "Add-on service provider discovered.\n";'
-          php artisan route:list --path='api/application/users/{user}/api-keys' | grep -q 'ApiKeyController'
-          php artisan route:list --path='api/application/nodes/{node}/allocations/free' | grep -q 'FreeAllocationController'
-          php artisan route:list --path='api/client/servers/{server}/files/update' | grep -q 'FileController'
+          php <<'PHP'
+          <?php
+          require 'vendor/autoload.php';
+          $app = require 'bootstrap/app.php';
+          $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+          $kernel->bootstrap();
+
+          $routes = $app->make('router')->getRoutes();
+
+          $expected = [
+              ['uri' => 'api/application/users/{user}/api-keys', 'method' => 'GET', 'controller' => 'Xepare\\PterodactylApiAddon\\Http\\Controllers\\ApiKeyController'],
+              ['uri' => 'api/application/users/{user}/api-keys', 'method' => 'POST', 'controller' => 'Xepare\\PterodactylApiAddon\\Http\\Controllers\\ApiKeyController'],
+              ['uri' => 'api/application/users/{user}/api-keys/{identifier}', 'method' => 'DELETE', 'controller' => 'Xepare\\PterodactylApiAddon\\Http\\Controllers\\ApiKeyController'],
+              ['uri' => 'api/application/nodes/{node}/allocations/free', 'method' => 'GET', 'controller' => 'Xepare\\PterodactylApiAddon\\Http\\Controllers\\FreeAllocationController'],
+              ['uri' => 'api/client/servers/{server}/files/update', 'method' => 'POST', 'controller' => 'Xepare\\PterodactylApiAddon\\Http\\Controllers\\FileController'],
+          ];
+
+          foreach ($expected as $definition) {
+              $found = false;
+              foreach ($routes as $route) {
+                  $action = $route->getActionName();
+                  if (
+                      $route->uri() === $definition['uri']
+                      && in_array($definition['method'], $route->methods(), true)
+                      && str_contains($action, $definition['controller'])
+                  ) {
+                      $found = true;
+                      break;
+                  }
+              }
+
+              if (!$found) {
+                  fwrite(STDERR, sprintf(
+                      "Missing expected add-on route: %s %s (%s)\n",
+                      $definition['method'],
+                      $definition['uri'],
+                      $definition['controller']
+                  ));
+                  exit(1);
+              }
+          }
+
+          echo "Add-on routes discovered.\n";
+          PHP
 
       - name: Run PHP syntax checks
         working-directory: ${{ github.workspace }}/pterodactyl-api-addon
