@@ -2,12 +2,12 @@
 
 namespace Xepare\PterodactylApiAddon\Tests\Integration\Api\Client;
 
-use GuzzleHttp\Psr7\Response as Psr7Response;
+use Pterodactyl\Models\User;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\ApiKey;
 use Pterodactyl\Models\Permission;
 use Pterodactyl\Models\Server;
-use Pterodactyl\Models\User;
+use GuzzleHttp\Psr7\Response as Psr7Response;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
 use Pterodactyl\Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
 
