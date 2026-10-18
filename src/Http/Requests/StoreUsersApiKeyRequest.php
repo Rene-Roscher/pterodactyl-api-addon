@@ -3,8 +3,8 @@
 namespace Xepare\PterodactylApiAddon\Http\Requests;
 
 use IPTools\Range;
-use IPTools\Exception\IpException;
 use Pterodactyl\Models\ApiKey;
+use IPTools\Exception\IpException;
 use Illuminate\Validation\Validator;
 use Pterodactyl\Services\Acl\Api\AdminAcl as Acl;
 use Pterodactyl\Http\Requests\Api\Application\ApplicationApiRequest;
@@ -40,7 +40,7 @@ class StoreUsersApiKeyRequest extends ApplicationApiRequest
                 $valid = true;
                 try {
                     Range::parse($ip);
-                } catch (IpException) {
+                } catch (IpException|\InvalidArgumentException) {
                     $valid = false;
                 }
 
