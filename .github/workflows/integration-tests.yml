@@ -1,0 +1,203 @@
+name: Integration Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  workflow_dispatch:
+
+env:
+  PANEL_REF: refs/tags/v1.15.1
+  PTERODACTYL_PANEL_PATH: ../panel
+  APP_ENV: testing
+  APP_DEBUG: false
+  APP_URL: http://localhost
+  CACHE_DRIVER: array
+  QUEUE_CONNECTION: sync
+  SESSION_DRIVER: array
+  MAIL_MAILER: log
+  DB_CONNECTION: mysql
+  DB_HOST: 127.0.0.1
+  DB_PORT: 3306
+  DB_DATABASE: panel_integration_test
+  DB_USERNAME: root
+  DB_PASSWORD: root
+
+jobs:
+  integration:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: panel_integration_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout add-on repository
+        uses: actions/checkout@v4
+        with:
+          path: pterodactyl-api-addon
+
+      - name: Checkout Pterodactyl Panel
+        uses: actions/checkout@v4
+        with:
+          repository: pterodactyl/panel
+          ref: ${{ env.PANEL_REF }}
+          path: panel
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: bcmath, ctype, curl, dom, fileinfo, gd, iconv, intl, json, mbstring, openssl, pdo, pdo_mysql, simplexml, tokenizer, xml, zip
+          tools: composer:v2
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        working-directory: ${{ github.workspace }}/panel
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-panel-${{ hashFiles('panel/composer.lock', 'pterodactyl-api-addon/composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-panel-
+
+      - name: Configure Panel test environment
+        working-directory: ${{ github.workspace }}/panel
+        run: |
+          cp .env.example .env
+          {
+            echo "APP_ENV=testing"
+            echo "APP_DEBUG=false"
+            echo "APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+            echo "APP_URL=http://localhost"
+            echo "CACHE_DRIVER=array"
+            echo "QUEUE_CONNECTION=sync"
+            echo "SESSION_DRIVER=array"
+            echo "MAIL_MAILER=log"
+            echo "DB_CONNECTION=mysql"
+            echo "DB_HOST=127.0.0.1"
+            echo "DB_PORT=3306"
+            echo "DB_DATABASE=panel_integration_test"
+            echo "DB_USERNAME=root"
+            echo "DB_PASSWORD=root"
+          } >> .env
+
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            if mysql -h 127.0.0.1 -uroot -proot -e 'SELECT 1' >/dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "MySQL did not become ready in time."
+          exit 1
+
+      - name: Ensure disposable test database exists
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS panel_integration_test"
+
+      - name: Install Panel dependencies
+        working-directory: ${{ github.workspace }}/panel
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install add-on from local path repository
+        working-directory: ${{ github.workspace }}/panel
+        run: |
+          composer config repositories.local-addon '{"type":"path","url":"../pterodactyl-api-addon","options":{"symlink":true}}'
+          composer require rene-roscher/pterodactyl-api-addon:@dev --no-interaction --no-progress
+
+      - name: Verify local package source is this checkout
+        working-directory: ${{ github.workspace }}/panel
+        run: |
+          php -r '$expected = realpath("../pterodactyl-api-addon"); $actual = realpath("vendor/rene-roscher/pterodactyl-api-addon"); if (!$expected || !$actual || $expected !== $actual) { fwrite(STDERR, "Expected local package path {$expected}, got {$actual}.\n"); exit(1);} echo "Using local package checkout: {$actual}\n";'
+
+      - name: Verify package discovery and route registration
+        working-directory: ${{ github.workspace }}/panel
+        run: |
+          php artisan package:discover --ansi
+          php -r 'require "vendor/autoload.php"; $app = require "bootstrap/app.php"; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); if (!$app->providerIsLoaded(Xepare\PterodactylApiAddon\PterodactylApiAddonServiceProvider::class)) { fwrite(STDERR, "Add-on service provider was not discovered.\n"); exit(1);} echo "Add-on service provider discovered.\n";'
+          php <<'PHP'
+          <?php
+          require 'vendor/autoload.php';
+          $app = require 'bootstrap/app.php';
+          $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+          $kernel->bootstrap();
+
+          $routes = $app->make('router')->getRoutes();
+
+          $expected = [
+              ['uri' => 'api/application/users/{user}/api-keys', 'method' => 'GET', 'controller' => 'Xepare\\PterodactylApiAddon\\Http\\Controllers\\ApiKeyController'],
+              ['uri' => 'api/application/users/{user}/api-keys', 'method' => 'POST', 'controller' => 'Xepare\\PterodactylApiAddon\\Http\\Controllers\\ApiKeyController'],
+              ['uri' => 'api/application/users/{user}/api-keys/{identifier}', 'method' => 'DELETE', 'controller' => 'Xepare\\PterodactylApiAddon\\Http\\Controllers\\ApiKeyController'],
+              ['uri' => 'api/application/nodes/{node}/allocations/free', 'method' => 'GET', 'controller' => 'Xepare\\PterodactylApiAddon\\Http\\Controllers\\FreeAllocationController'],
+              ['uri' => 'api/client/servers/{server}/files/update', 'method' => 'POST', 'controller' => 'Xepare\\PterodactylApiAddon\\Http\\Controllers\\FileController'],
+          ];
+
+          foreach ($expected as $definition) {
+              $found = false;
+              foreach ($routes as $route) {
+                  $action = $route->getActionName();
+                  if (
+                      $route->uri() === $definition['uri']
+                      && in_array($definition['method'], $route->methods(), true)
+                      && str_contains($action, $definition['controller'])
+                  ) {
+                      $found = true;
+                      break;
+                  }
+              }
+
+              if (!$found) {
+                  fwrite(STDERR, sprintf(
+                      "Missing expected add-on route: %s %s (%s)\n",
+                      $definition['method'],
+                      $definition['uri'],
+                      $definition['controller']
+                  ));
+                  exit(1);
+              }
+          }
+
+          echo "Add-on routes discovered.\n";
+          PHP
+
+      - name: Run PHP syntax checks
+        working-directory: ${{ github.workspace }}/pterodactyl-api-addon
+        run: |
+          find src tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Run code style checks
+        working-directory: ${{ github.workspace }}/pterodactyl-api-addon
+        run: ../panel/vendor/bin/php-cs-fixer fix --dry-run --diff --config=../panel/.php-cs-fixer.dist.php src tests
+
+      - name: Run static analysis
+        working-directory: ${{ github.workspace }}/pterodactyl-api-addon
+        run: ../panel/vendor/bin/phpstan analyse --no-progress --autoload-file=../panel/vendor/autoload.php src tests
+
+      - name: Run add-on integration tests against bootstrapped Panel
+        working-directory: ${{ github.workspace }}/pterodactyl-api-addon
+        run: ../panel/vendor/bin/phpunit -c phpunit.integration.xml

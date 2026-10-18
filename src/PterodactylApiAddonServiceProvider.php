@@ -3,19 +3,14 @@
 namespace Xepare\PterodactylApiAddon;
 
 use Illuminate\Support\ServiceProvider;
-use Spatie\LaravelPackageTools\Package;
 
 class PterodactylApiAddonServiceProvider extends ServiceProvider
 {
-
     /**
      * Bootstrap any package services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
     }
-
 }
